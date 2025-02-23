@@ -33,12 +33,16 @@ impl Lexer {
         for ch in &self.src {
             match ch {
                 '\n' | ' ' => {
-                    symbols.push(symbol.clone());
-                    symbol.clear();
+                    if !symbol.is_empty() {
+                        symbols.push(symbol.clone());
+                        symbol.clear();
+                    }
                 }
                 '(' | ')' | '[' | ']' | '{' | '}' | '=' | ';' => {
-                    symbols.push(symbol.clone());
-                    symbol.clear();
+                    if !symbol.is_empty() {
+                        symbols.push(symbol.clone());
+                        symbol.clear();
+                    }
                     symbols.push(ch.to_string());
                 }
                 _ => symbol.push(*ch),
@@ -53,6 +57,7 @@ impl Lexer {
 
     pub fn tokenize(&self) -> Vec<Token> {
         let symbols = self.split_symbols();
+        dbg!(&symbols);
         let mut tokens = Vec::with_capacity(symbols.len());
         // regexes
         let int_regex = Regex::new(r"[0-9]+").unwrap();
