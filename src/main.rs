@@ -1,4 +1,5 @@
 use rcc::lexer::lex::Lexer;
+use rcc::parser::pars::Parser;
 use std::fs;
 
 fn main() {
@@ -6,7 +7,6 @@ fn main() {
     let lexer = Lexer::new(&file);
     let tokens = lexer.tokenize();
 
-    for token in tokens {
-        println!("{:?}", token);
-    }
+    let parser = Parser::new();
+    parser.process_tokens(tokens);
 }

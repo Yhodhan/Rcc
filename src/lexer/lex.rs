@@ -17,6 +17,8 @@ pub enum Token {
     Semicolon(char),
     Equal(char),
     Integer(i32),
+    Operand(char),
+    Obelisk(char),
     Unknown,
 }
 
@@ -57,7 +59,6 @@ impl Lexer {
 
     pub fn tokenize(&self) -> Vec<Token> {
         let symbols = self.split_symbols();
-        dbg!(&symbols);
         let mut tokens = Vec::with_capacity(symbols.len());
         // regexes
         let int_regex = Regex::new(r"[0-9]+").unwrap();
@@ -69,6 +70,9 @@ impl Lexer {
         let int_keyword = Regex::new(r"int").unwrap();
         let return_keyword = Regex::new(r"return").unwrap();
         let identifier = Regex::new(r"[a-zA-z]\w*").unwrap();
+        let equal = Regex::new(r"=").unwrap();
+        let operand = Regex::new(r"<|>|>=|<=").unwrap();
+        let obelisk = Regex::new(r"\*").unwrap();
 
         for symbol in symbols {
             let token;
@@ -85,6 +89,12 @@ impl Lexer {
                 token = Token::RightParen(self.obtain_char(symbol));
             } else if semicolon.is_match(&symbol) {
                 token = Token::Semicolon(self.obtain_char(symbol));
+            } else if operand.is_match(&symbol) {
+                token = Token::Operand(self.obtain_char(symbol));
+            } else if obelisk.is_match(&symbol) {
+                token = Token::Obelisk(self.obtain_char(symbol));
+            } else if equal.is_match(&symbol) {
+                token = Token::Equal(self.obtain_char(symbol));
             } else if int_keyword.is_match(&symbol) {
                 token = Token::Keyword(symbol);
             } else if return_keyword.is_match(&symbol) {
@@ -92,7 +102,6 @@ impl Lexer {
             } else if identifier.is_match(&symbol) {
                 token = Token::Identifier(symbol);
             } else {
-                dbg!(&symbol);
                 token = Token::Unknown;
             }
             tokens.push(token);
